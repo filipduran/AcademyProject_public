@@ -1,0 +1,3 @@
+rootProject.name='AcademyProject'
+include ':app'
+include ':model'
