@@ -5,14 +5,15 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import hr.fer.filip.academyproject.databinding.ReposDetailsBinding
-import hr.fer.filip.model.Repository
+import hr.fer.filip.model.RepoDetails
 
-class RecyclerAdapter(val itemClickListener: OnItemClickListener) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class RecyclerAdapter(private val itemClickListener: OnItemClickListener) :
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private val reposDetailsList = ArrayList<Repository>()
+    private val reposDetailsList = ArrayList<RepoDetails>()
 
     interface OnItemClickListener {
-        fun onItemClicked(repository : Repository)
+        fun onItemClicked(repository: RepoDetails)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -26,16 +27,11 @@ class RecyclerAdapter(val itemClickListener: OnItemClickListener) : RecyclerView
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        (holder as RepositoryViewHolder).bind(reposDetailsList[position],itemClickListener)
+        (holder as RepositoryViewHolder).bind(reposDetailsList[position], itemClickListener)
     }
 
-    fun updateList(newList : List<Repository>) {
-        val result = DiffUtil.calculateDiff(
-            RepoListCallBack(
-                this.reposDetailsList,
-                newList
-            )
-        )
+    fun updateList(newList: List<RepoDetails>) {
+        val result = DiffUtil.calculateDiff(RepoListCallBack(this.reposDetailsList, newList))
         this.reposDetailsList.clear()
         this.reposDetailsList.addAll(newList)
         result.dispatchUpdatesTo(this)

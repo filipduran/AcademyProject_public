@@ -10,7 +10,7 @@
         android:layout_marginTop="4dp">
 
         <TextView
-            android:id="@+id/issueTitle"
+            android:id="@+id/pullTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingStart="16dp"

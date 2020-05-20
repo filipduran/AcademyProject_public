@@ -12,20 +12,35 @@ class Network {
 
     companion object {
 
-        lateinit var service : NetworkAPI
+        lateinit var service: NetworkAPI
+
 
         fun init(context: Context) {
 
             val httpLoggingInterceptor = HttpLoggingInterceptor()
             httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.BASIC
 
-            val httpCacheDirectory = File(context.cacheDir,"responses")
+            val httpCacheDirectory = File(context.cacheDir, "responses")
             val cacheSize = 50 * 1024 * 1024
             val cache = Cache(httpCacheDirectory, cacheSize.toLong())
 
             val okHttp = OkHttpClient.Builder()
                 .addNetworkInterceptor(httpLoggingInterceptor)
-//                .cache(cache)
+                .addInterceptor { chain ->
+                    val request = chain.request()
+                    val newRequest = request.newBuilder()
+                        .header("Authorization", "token 7cf2340fc808c92fc147aa0112e120ef7f9076c8")
+                        .build()
+                    return@addInterceptor chain.proceed(newRequest)
+                }
+                .addNetworkInterceptor { chain ->
+                    val response = chain.proceed(chain.request())
+                    val maxAge = 14
+                    return@addNetworkInterceptor response.newBuilder()
+                        .header("Cache-Control", "max-age=" + maxAge)
+                        .build()
+                }
+                .cache(cache)
                 .build()
 
             val retrofit = Retrofit.Builder()

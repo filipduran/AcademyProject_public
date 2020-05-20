@@ -13,27 +13,27 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import hr.fer.filip.academyproject.DetailsActivityViewModel
 import hr.fer.filip.academyproject.databinding.FragmentLayoutBinding
 
-class IssuesFragment : Fragment() {
+class PullsFragment : Fragment() {
 
     private lateinit var repoID: String
-    private lateinit var orgName : String
+    private lateinit var orgName: String
     private val viewModel by activityViewModels<DetailsActivityViewModel>()
     private var timeOnResume = System.currentTimeMillis()
     private var timeOnPause = System.currentTimeMillis()
     private var firstTime = true
 
-    val handler = Handler()
-    private var runnable = object : Runnable {
+    private val handler = Handler()
+    private val runnable = object : Runnable {
         override fun run() {
-            viewModel.getIssuesList(orgName, repoID)
+            viewModel.getPullsList(orgName, repoID)
             handler.postDelayed(this, 15000)
         }
     }
 
 
     companion object {
-        fun newInstance(orgName: String, repoID: String): IssuesFragment {
-            val fragment = IssuesFragment()
+        fun newInstance(orgName: String, repoID: String): PullsFragment {
+            val fragment = PullsFragment()
             val args = Bundle()
             args.putString("orgName", orgName)
             args.putString("repoID", repoID)
@@ -46,8 +46,8 @@ class IssuesFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (arguments != null) {
-            repoID = requireArguments().getString("orgName").toString()
-            orgName = requireArguments().getString("repoID").toString()
+            repoID = requireArguments().getString("repoID").toString()
+            orgName = requireArguments().getString("orgName").toString()
         }
 
     }
@@ -71,26 +71,26 @@ class IssuesFragment : Fragment() {
         }
 
         viewModel.repoDetails.observe(viewLifecycleOwner, Observer {
-            Log.d("xxxxxxxxxxxx", "Entered IssuesFragment observer")
+            Log.d("xxxxxxxxxxxx", "Entered PullsFragment observer")
             repoID = it.name
             orgName = it.owner.login
         })
 
-        viewModel.issueList.observe(viewLifecycleOwner, Observer {
+        viewModel.pullList.observe(viewLifecycleOwner, Observer {
             recyclerAdapter.updateList(it)
             if (binding.swipeRefresh.isRefreshing) {
                 binding.swipeRefresh.isRefreshing = false
             }
             binding.fragmentRecycler.visibility = View.VISIBLE
             binding.progressBar.visibility = View.GONE
-        })
 
+        })
 
         return binding.root
 
     }
 
-override fun onResume() {
+    override fun onResume() {
         super.onResume()
         timeOnResume = System.currentTimeMillis()
         val timeElapsed = timeOnResume - timeOnPause
@@ -102,13 +102,13 @@ override fun onResume() {
         } else {
             handler.postDelayed(runnable, 15000 - timeElapsed)
         }
+
+
     }
 
     override fun onPause() {
         super.onPause()
         timeOnPause = System.currentTimeMillis()
         handler.removeCallbacksAndMessages(null)
-
-
     }
 }

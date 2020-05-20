@@ -65,4 +65,6 @@ dependencies {
     implementation project(":model")
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
+
+    implementation 'com.google.android.material:material:1.1.0'
 }

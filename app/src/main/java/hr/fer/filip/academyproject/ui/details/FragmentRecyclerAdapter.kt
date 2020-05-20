@@ -6,8 +6,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import hr.fer.filip.academyproject.databinding.ItemContributorBinding
 import hr.fer.filip.academyproject.databinding.ItemIssueBinding
+import hr.fer.filip.academyproject.databinding.ItemPullBinding
 import hr.fer.filip.model.Contributor
 import hr.fer.filip.model.Issue
+import hr.fer.filip.model.Pull
 import kotlin.collections.ArrayList
 
 class FragmentRecyclerAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -15,7 +17,7 @@ class FragmentRecyclerAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
     private val recyclerList = ArrayList<Any>()
     private val TYPE_CONTRIBUTOR = 0
     private val TYPE_ISSUE = 1
-    private val TYPE_ERROR = -1
+    private val TYPE_PULL = 2
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         when(viewType) {
@@ -31,8 +33,8 @@ class FragmentRecyclerAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
             }
             else -> {
                 val inflater = LayoutInflater.from(parent.context)
-                val binding = ItemContributorBinding.inflate(inflater, parent, false)
-                return ContributorViewHolder(binding)
+                val binding = ItemPullBinding.inflate(inflater, parent, false)
+                return PullViewHolder(binding)
             }
         }
     }
@@ -42,11 +44,10 @@ class FragmentRecyclerAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if(recyclerList[position] is Contributor) {
-            (holder as ContributorViewHolder).binding.contributorsName.setText((recyclerList[position] as Contributor).login)
-        }
-        if(recyclerList[position] is Issue) {
-            (holder as IssueViewHolder).binding.issueTitle.setText((recyclerList[position] as Issue).title)
+        when (holder) {
+            is ContributorViewHolder -> holder.bind(recyclerList[position] as Contributor)
+            is IssueViewHolder -> holder.bind(recyclerList[position] as Issue)
+            else -> (holder as PullViewHolder).bind(recyclerList[position] as Pull)
         }
     }
 
@@ -55,13 +56,14 @@ class FragmentRecyclerAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() 
         this.recyclerList.clear()
         this.recyclerList.addAll(newList)
         result.dispatchUpdatesTo(this)
+
     }
 
     override fun getItemViewType(position: Int): Int {
-        when(recyclerList[position]) {
-            is Contributor -> return TYPE_CONTRIBUTOR
-            is Issue -> return TYPE_ISSUE
-            else -> return TYPE_ERROR
+        return when(recyclerList[position]) {
+            is Contributor -> TYPE_CONTRIBUTOR
+            is Issue -> TYPE_ISSUE
+            else -> TYPE_PULL
         }
     }
 }

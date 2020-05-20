@@ -7,40 +7,37 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import hr.fer.filip.academyproject.DetailsActivityViewModel
 import hr.fer.filip.academyproject.databinding.FragmentLayoutBinding
-import hr.fer.filip.model.Contributor
 
-/**
- * A placeholder fragment containing a simple view.
- */
+
 class ContributorsFragment : Fragment() {
 
-    private lateinit var contributorsList: ArrayList<Contributor>
     private lateinit var repoID: String
-    private val viewModel by viewModels<DetailsActivityViewModel>()
+    private lateinit var orgName: String
+    private val viewModel by activityViewModels<DetailsActivityViewModel>()
     private var timeOnResume = System.currentTimeMillis()
     private var timeOnPause = System.currentTimeMillis()
     private var firstTime = true
 
-    val handler = Handler()
-    private var runnable = object : Runnable {
+    private val handler = Handler()
+    private val runnable = object : Runnable {
         override fun run() {
-            viewModel.getContributorList(repoID)
+            viewModel.getContributorList(orgName, repoID)
             handler.postDelayed(this, 15000)
         }
     }
 
 
     companion object {
-        fun newInstance(param1: ArrayList<Contributor>, param2: String): ContributorsFragment {
+        fun newInstance(orgName: String, repoID: String): ContributorsFragment {
             val fragment = ContributorsFragment()
             val args = Bundle()
-            args.putSerializable("param1", param1)
-            args.putString("param2", param2)
+            args.putString("orgName", orgName)
+            args.putString("repoID", repoID)
             fragment.arguments = args
             return fragment
         }
@@ -50,10 +47,10 @@ class ContributorsFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (arguments != null) {
-            contributorsList =
-                requireArguments().getSerializable("param1") as ArrayList<Contributor>
-            repoID = requireArguments().getString("param2").toString()
+            repoID = requireArguments().getString("repoID").toString()
+            orgName = requireArguments().getString("orgName").toString()
         }
+
     }
 
     override fun onCreateView(
@@ -68,15 +65,26 @@ class ContributorsFragment : Fragment() {
         binding.fragmentRecycler.layoutManager = manager
         binding.fragmentRecycler.adapter = recyclerAdapter
 
-        viewModel.data.observe(viewLifecycleOwner, Observer {
-            Log.d("xxxxxxxxxxxx", "Entered IssuesFragment observer")
+        binding.swipeRefresh.setOnRefreshListener {
+            Log.d("xxxxxxxxxxxx", "Called manual refresh")
+            handler.removeCallbacksAndMessages(null)
+            handler.post(runnable)
+        }
+
+        viewModel.repoDetails.observe(viewLifecycleOwner, Observer {
+            Log.d("xxxxxxxxxxxx", "Entered ContributorFragment observer")
             repoID = it.name
+            orgName = it.owner.login
         })
 
         viewModel.contributorList.observe(viewLifecycleOwner, Observer {
             recyclerAdapter.updateList(it)
-        })
+            if (binding.swipeRefresh.isRefreshing) {
+                binding.swipeRefresh.isRefreshing = false
+            }
+            binding.progressBar.visibility = View.GONE
 
+        })
 
         return binding.root
 
@@ -92,10 +100,7 @@ class ContributorsFragment : Fragment() {
                 firstTime = false
             }
         } else {
-            Handler().postDelayed({
-                viewModel.getContributorList(repoID)
-            }, 15000 - timeElapsed)
-            handler.postDelayed(runnable, 15000)
+            handler.postDelayed(runnable, 15000 - timeElapsed)
         }
 
 
@@ -104,8 +109,6 @@ class ContributorsFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         timeOnPause = System.currentTimeMillis()
-        handler.removeCallbacks(runnable)
+        handler.removeCallbacksAndMessages(null)
     }
-
-
 }

@@ -1,9 +1,9 @@
 package hr.fer.filip.academyproject.ui.main
 
 import androidx.recyclerview.widget.DiffUtil
-import hr.fer.filip.model.Repository
+import hr.fer.filip.model.RepoDetails
 
-class RepoListCallBack (oldList: List<Repository>, newList: List<Repository>) : DiffUtil.Callback() {
+class RepoListCallBack (oldList: List<RepoDetails>, newList: List<RepoDetails>) : DiffUtil.Callback() {
     private val oldList = oldList.toList()
     private val newList = newList.toList()
 

@@ -3,6 +3,7 @@ package hr.fer.filip.academyproject.ui.details
 import androidx.recyclerview.widget.DiffUtil
 import hr.fer.filip.model.Contributor
 import hr.fer.filip.model.Issue
+import hr.fer.filip.model.Pull
 
 class FragmentListCallBack(oldList: List<Any>, newList: List<Any>) : DiffUtil.Callback() {
     private val oldList = oldList.toList()
@@ -10,17 +11,25 @@ class FragmentListCallBack(oldList: List<Any>, newList: List<Any>) : DiffUtil.Ca
 
 
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        if (oldList[oldItemPosition] is Contributor) {
-            if ((oldList[oldItemPosition] as Contributor).login.equals((newList[newItemPosition] as Contributor).login)) {
-                return true
+        val oldItem = oldList[oldItemPosition]
+        val newItem = newList[newItemPosition]
+        when (oldItem) {
+            is Contributor -> {
+                if (oldItem.login.equals((newItem as Contributor).login)) {
+                    return true
+                }
+            }
+            is Issue -> {
+                if (oldItem.title.equals((newItem as Issue).title)) {
+                    return true
+                }
+            }
+            else -> {
+                if ((oldItem as Pull).title.equals((newItem as Pull).title)) {
+                    return true
+                }
             }
         }
-        if (oldList[oldItemPosition] is Issue) {
-            if ((oldList[oldItemPosition] as Issue).title.equals((newList[newItemPosition] as Issue).title)) {
-                return true
-            }
-        }
-
         return false
     }
 
