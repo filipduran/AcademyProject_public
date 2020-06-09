@@ -27,13 +27,13 @@ class Network {
             //Token no longer valid. Left it just as an example.
             val okHttp = OkHttpClient.Builder()
                 .addNetworkInterceptor(httpLoggingInterceptor)
-                .addInterceptor { chain ->
-                    val request = chain.request()
-                    val newRequest = request.newBuilder()
-                        .header("Authorization", "token 7cf2340fc808c92fc147aa0112e120ef7f9076c8")
-                        .build()
-                    return@addInterceptor chain.proceed(newRequest)
-                }
+//                .addInterceptor { chain ->
+////                    val request = chain.request()
+////                    val newRequest = request.newBuilder()
+////                        .header("Authorization", "token 7cf2340fc808c92fc147aa0112e120ef7f9076c8")
+////                        .build()
+////                    return@addInterceptor chain.proceed(newRequest)
+////                }
                 .addNetworkInterceptor { chain ->
                     val response = chain.proceed(chain.request())
                     val maxAge = 14
