@@ -83,6 +83,7 @@ class DetailsActivity : FragmentActivity() {
                 }
             }
             sectionsPagerAdapter.addFragments(fragmentList, titleList)
+            viewPager.offscreenPageLimit = fragmentList.size - 1
             viewPager.adapter = sectionsPagerAdapter
         })
 
