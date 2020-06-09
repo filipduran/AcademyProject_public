@@ -24,6 +24,7 @@ class Network {
             val cacheSize = 50 * 1024 * 1024
             val cache = Cache(httpCacheDirectory, cacheSize.toLong())
 
+            //Token no longer valid. Left it just as an example.
             val okHttp = OkHttpClient.Builder()
                 .addNetworkInterceptor(httpLoggingInterceptor)
                 .addInterceptor { chain ->
